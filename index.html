@@ -666,7 +666,7 @@ function syncUI(state) {
 
 /* ── debounced save ── */
 let _fbTimer = null;
-function fbSaveSoon() { syncUI('syncing'); clearTimeout(_fbTimer); _fbTimer = setTimeout(fbSave, 900); }
+function fbSaveSoon() { syncUI('syncing'); clearTimeout(_fbTimer); _fbTimer = setTimeout(async () => { _fbTimer = null; await fbSave(); }, 900); }
 
 async function fbSave() {
   const players = {};
@@ -1135,9 +1135,15 @@ function _doSave() {
   fitNames();
   fbSaveSoon();
 }
-document.getElementById('modal-save').addEventListener('click', _doSave);
+let _saveTouched = false;
 document.getElementById('modal-save').addEventListener('touchend', e => {
-  e.preventDefault(); // prevent the ghost click that reopens modal
+  e.preventDefault();
+  _saveTouched = true;
+  _doSave();
+  setTimeout(() => { _saveTouched = false; }, 600);
+});
+document.getElementById('modal-save').addEventListener('click', () => {
+  if (_saveTouched) return; // already handled by touchend
   _doSave();
 });
 

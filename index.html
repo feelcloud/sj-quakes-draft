@@ -244,7 +244,7 @@
     position:sticky; bottom:0; background:var(--bg3);
     border-radius:0 0 18px 18px;
   }
-  .btn-save {
+  .btn-save { touch-action: manipulation;
     flex:1; padding:11px; border-radius:10px; border:none;
     background:linear-gradient(135deg,#48bb78,#2f855a);
     color:#fff; font-family:'Inter Tight',sans-serif;
@@ -683,7 +683,9 @@ async function fbSave() {
       [...list.querySelectorAll('.card[data-name]')].map(c=>c.dataset.name);
   });
   try {
+    console.log('Saving to Firebase...', Object.keys(players).length, 'players');
     await _stateRef.set({ players, orders });
+    console.log('Firebase save OK');
     syncUI('saved');
   } catch(e) {
     console.error('Firebase save error:', e);
@@ -1112,44 +1114,33 @@ document.getElementById('btn-apply-url').addEventListener('click', ()=>{
 /* save */
 function _doSave() {
   if (!modalName) return;
-  const s=playerState[modalName];
+  const name = modalName;     // capture before closeModal clears it
+  const s = playerState[name];
 
-  /* positions */
-  s.posicao=[...posChips.querySelectorAll('.pos-chip.sel')].map(c=>c.dataset.pos);
+  /* 1. Close modal FIRST — user sees immediate feedback */
+  closeModal();
 
-  /* photo */
-  if (modalNewPhoto) s.foto=modalNewPhoto;
-
-  /* stats */
-  const v=x=>x===''?'—':x;
+  /* 2. Update state */
+  s.posicao      = [...posChips.querySelectorAll('.pos-chip.sel')].map(c=>c.dataset.pos);
+  if (modalNewPhoto) s.foto = modalNewPhoto;
+  const v = x => x==='' ? '—' : x;
   s.jogos        = v(mJogos.value);
   s.gols         = v(mGols.value);
   s.assistencias = v(mAss.value);
   s.amarelos     = v(mAmar.value);
   s.vermelhos    = v(mVerm.value);
 
-  /* refresh all DOM cards for this player */
-  (cardEls[modalName]||[]).forEach(card=>refreshCard(card, modalName));
-
-  closeModal();
+  /* 3. Refresh cards in DOM */
+  (cardEls[name]||[]).forEach(card => refreshCard(card, name));
   applyFilters();
   fitNames();
-  // Save immediately (no debounce) for modal changes
+
+  /* 4. Save to Firebase immediately */
   clearTimeout(_fbTimer);
   _fbTimer = null;
   fbSave();
 }
-let _saveTouched = false;
-document.getElementById('modal-save').addEventListener('touchend', e => {
-  e.preventDefault();
-  _saveTouched = true;
-  _doSave();
-  setTimeout(() => { _saveTouched = false; }, 600);
-});
-document.getElementById('modal-save').addEventListener('click', () => {
-  if (_saveTouched) return; // already handled by touchend
-  _doSave();
-});
+document.getElementById('modal-save').addEventListener('click', _doSave);
 
 /* ═══ DESKTOP COLUMNS + DRAG ═══ */
 const board=document.getElementById('board');

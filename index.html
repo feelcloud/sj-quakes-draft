@@ -686,8 +686,9 @@ async function fbSave() {
     await _stateRef.set({ players, orders });
     syncUI('saved');
   } catch(e) {
-    console.warn('Firebase save error:', e);
+    console.error('Firebase save error:', e);
     syncUI('error');
+    alert('Erro ao salvar: ' + e.message);
   }
 }
 
@@ -902,7 +903,7 @@ function buildCardEl(p) {
 
   const card=document.createElement('div');
   card.className='card'+(found?'':' not-found');
-  card.draggable=true;
+  card.draggable = window.matchMedia("(min-width:768px)").matches;
   card.dataset.name=p.name;
   card.dataset.kit=p.kit;
 
@@ -1133,7 +1134,10 @@ function _doSave() {
   closeModal();
   applyFilters();
   fitNames();
-  fbSaveSoon();
+  // Save immediately (no debounce) for modal changes
+  clearTimeout(_fbTimer);
+  _fbTimer = null;
+  fbSave();
 }
 let _saveTouched = false;
 document.getElementById('modal-save').addEventListener('touchend', e => {

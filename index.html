@@ -1144,10 +1144,7 @@ function _doSave() {
   const name = modalName;     // capture before closeModal clears it
   const s = playerState[name];
 
-  /* 1. Close modal FIRST — user sees immediate feedback */
-  closeModal();
-
-  /* 2. Update state */
+  /* 1. Update state FIRST so refreshCard sees correct values */
   s.posicao      = [...posChips.querySelectorAll('.pos-chip.sel')].map(c=>c.dataset.pos);
   if (modalNewPhoto) s.foto = modalNewPhoto;
   const v = x => x==='' ? '—' : x;
@@ -1157,15 +1154,23 @@ function _doSave() {
   s.amarelos     = v(mAmar.value);
   s.vermelhos    = v(mVerm.value);
 
-  /* 3. Refresh cards in DOM */
-  (cardEls[name]||[]).forEach(card => refreshCard(card, name));
+  /* 2. Refresh cards in DOM with updated state */
+  (cardEls[name]||[]).forEach(card => {
+    refreshCard(card, name);
+    // Update photo directly on the img element (handles both base64 and URL)
+    const img = card.querySelector('.card-photo');
+    if (img && s.foto) img.src = s.foto;
+  });
+
+  /* 3. Close modal — user sees it close after cards are updated */
+  closeModal();
   applyFilters();
   fitNames();
 
   /* 4. Save to Firebase immediately */
   clearTimeout(_fbTimer);
   _fbTimer = null;
-  fbSave(); // async — errors shown via alert inside fbSave
+  fbSave();
 }
 document.getElementById('modal-save').addEventListener('click', _doSave);
 

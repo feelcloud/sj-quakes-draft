@@ -666,31 +666,47 @@ function syncUI(state) {
 
 /* ── debounced save ── */
 let _fbTimer = null;
-function fbSaveSoon() { syncUI('syncing'); clearTimeout(_fbTimer); _fbTimer = setTimeout(async () => { _fbTimer = null; await fbSave(); }, 900); }
+function fbSaveSoon() {
+  syncUI('syncing');
+  clearTimeout(_fbTimer);
+  _fbTimer = setTimeout(async () => {
+    _fbTimer = null;
+    await fbSave();
+  }, 900);
+}
 
 async function fbSave() {
-  const players = {};
-  Object.entries(playerState).forEach(([name, s]) => {
-    const d = { n:name, p:s.posicao||[], d:s.dimmed||false,
-                j:s.jogos, g:s.gols, a:s.assistencias, am:s.amarelos, v:s.vermelhos };
-    if (s.foto && !s.foto.startsWith('data:image')) d.f = s.foto;
-    players[fbKey(name)] = d;
-  });
-  const orders = {};
-  KIT_ORDER.forEach(kit => {
-    const list = desktopColumns[kit];
-    if (list) orders[fbKey(kit)] =
-      [...list.querySelectorAll('.card[data-name]')].map(c=>c.dataset.name);
-  });
   try {
-    console.log('Saving to Firebase...', Object.keys(players).length, 'players');
-    await _stateRef.set({ players, orders });
-    console.log('Firebase save OK');
+    // Build players payload
+    const players = {};
+    Object.entries(playerState).forEach(([name, s]) => {
+      const d = { n:name, p:s.posicao||[], d:s.dimmed||false,
+                  j:s.jogos, g:s.gols, a:s.assistencias, am:s.amarelos, v:s.vermelhos };
+      // Only sync URL-based photos (not base64 blobs which are too large)
+      if (s.foto && !s.foto.startsWith('data:')) d.f = s.foto;
+      players[fbKey(name)] = d;
+    });
+
+    // Build order payload from desktop columns
+    const orders = {};
+    KIT_ORDER.forEach(kit => {
+      const list = desktopColumns[kit];
+      if (list) {
+        const names = [...list.querySelectorAll('.card[data-name]')]
+          .map(c => c.dataset.name)
+          .filter(Boolean);
+        if (names.length) orders[fbKey(kit)] = names;
+      }
+    });
+
+    console.log('[Firebase] Saving:', Object.keys(players).length, 'players,', Object.keys(orders).length, 'order lists');
+    await _stateRef.set({ players, orders, ts: Date.now() });
+    console.log('[Firebase] Save successful');
     syncUI('saved');
   } catch(e) {
-    console.error('Firebase save error:', e);
+    console.error('[Firebase] Save FAILED:', e.code, e.message);
     syncUI('error');
-    alert('Erro ao salvar: ' + e.message);
+    alert('Erro ao salvar no Firebase:\n' + e.code + ': ' + e.message);
   }
 }
 
@@ -742,14 +758,16 @@ function applyFbState(data) {
 /* ── start: load state then listen ── */
 function fbStart() {
   syncUI('syncing');
+  console.log('[Firebase] Connecting to project:', _fbCfg.projectId);
   _stateRef.get().then(snap => {
     if (snap.exists) applyFbState(snap.data());
     syncUI('saved');
     _stateRef.onSnapshot(snap => {
-      // Skip if this is our own write (already applied locally) or saving in progress
-      if (snap.metadata.hasPendingWrites || _fbTimer) return;
+      // Skip writes we originated (already applied locally)
+      if (snap.metadata.hasPendingWrites) return;
+      console.log('[Firebase] Remote update received, applying...');
       applyFbState(snap.data());
-    }, e => { console.warn('Snapshot error:', e); syncUI('error'); });
+    }, e => { console.warn('[Firebase] Snapshot error:', e); syncUI('error'); });
   }).catch(e => { console.warn('Firebase load error:', e); syncUI('error'); });
 }
 /* fbStart() called after DOM is populated */
@@ -1138,7 +1156,7 @@ function _doSave() {
   /* 4. Save to Firebase immediately */
   clearTimeout(_fbTimer);
   _fbTimer = null;
-  fbSave();
+  fbSave(); // async — errors shown via alert inside fbSave
 }
 document.getElementById('modal-save').addEventListener('click', _doSave);
 

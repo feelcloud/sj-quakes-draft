@@ -682,8 +682,8 @@ async function fbSave() {
     Object.entries(playerState).forEach(([name, s]) => {
       const d = { n:name, p:s.posicao||[], d:s.dimmed||false,
                   j:s.jogos, g:s.gols, a:s.assistencias, am:s.amarelos, v:s.vermelhos };
-      // Only sync URL-based photos (not base64 blobs which are too large)
-      if (s.foto && !s.foto.startsWith('data:')) d.f = s.foto;
+      // Save foto (resized base64 thumbnails are ~15-25KB, well within Firestore limits)
+      if (s.foto) d.f = s.foto;
       players[fbKey(name)] = d;
     });
 
@@ -890,7 +890,19 @@ function refreshCard(card, name) {
   if (!s) return;
 
   /* photo */
-  const photoEl = card.querySelector('.card-photo');
+  let photoEl = card.querySelector('.card-photo');
+  if (!photoEl) {
+    // Player was 'not found' with placeholder — upgrade to img if we now have a photo
+    const placeholder = card.querySelector('.card-photo-placeholder');
+    if (placeholder && s.foto) {
+      const img = document.createElement('img');
+      img.className = 'card-photo';
+      img.alt = name;
+      img.onerror = () => { img.src = avatarUrl(name); };
+      placeholder.replaceWith(img);
+      photoEl = img;
+    }
+  }
   if (photoEl) photoEl.src = s.foto || avatarUrl(name);
 
   const info = card.querySelector('.card-info');
@@ -1125,8 +1137,22 @@ document.getElementById('modal-photo-input').addEventListener('change', e=>{
   const file=e.target.files[0]; if(!file) return;
   const reader=new FileReader();
   reader.onload=ev=>{
-    modalNewPhoto=ev.target.result;
-    modalPhoto.src=modalNewPhoto;
+    // Resize to 200x200 thumbnail so it fits in Firestore
+    const img = new Image();
+    img.onload = () => {
+      const SIZE = 200;
+      const canvas = document.createElement('canvas');
+      canvas.width = SIZE; canvas.height = SIZE;
+      const ctx = canvas.getContext('2d');
+      // Crop to square from center
+      const side = Math.min(img.width, img.height);
+      const sx = (img.width  - side) / 2;
+      const sy = (img.height - side) / 2;
+      ctx.drawImage(img, sx, sy, side, side, 0, 0, SIZE, SIZE);
+      modalNewPhoto = canvas.toDataURL('image/jpeg', 0.75);
+      modalPhoto.src = modalNewPhoto;
+    };
+    img.src = ev.target.result;
   };
   reader.readAsDataURL(file);
 });
@@ -1157,9 +1183,6 @@ function _doSave() {
   /* 2. Refresh cards in DOM with updated state */
   (cardEls[name]||[]).forEach(card => {
     refreshCard(card, name);
-    // Update photo directly on the img element (handles both base64 and URL)
-    const img = card.querySelector('.card-photo');
-    if (img && s.foto) img.src = s.foto;
   });
 
   /* 3. Close modal — user sees it close after cards are updated */

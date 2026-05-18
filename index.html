@@ -67,29 +67,69 @@
 
   /* ══ CARD ══ */
   .card {
-    flex:1;
-    background:var(--bg4); border:1px solid var(--border2); border-radius:10px; padding:9px;
-    cursor:pointer; user-select:none;
-    transition:border-color .2s,transform .15s,box-shadow .2s,opacity .3s,filter .3s,background .3s;
-    display:grid;
-    grid-template-columns:auto 1fr auto;
-    grid-template-rows:auto auto;
-    column-gap:10px; row-gap:5px;
+    flex: 1;
+    background: var(--bg4); border: 1px solid var(--border2); border-radius: 10px; padding: 9px;
+    cursor: pointer; user-select: none;
+    transition: border-color .2s, transform .15s, box-shadow .2s, opacity .3s, filter .3s, background .3s;
+    display: grid;
+    grid-template-columns: 80px 1fr auto;
+    grid-template-rows: auto auto;
+    column-gap: 8px;
+    row-gap: 0;
   }
-  .card-photo, .card-photo-placeholder { grid-column:1; grid-row:1/3; align-self:start; }
-  .card-actions { grid-column:3; grid-row:1; align-self:start; }
+  /* LEFT COL — wrapper spans both rows, centers photo+pos vertically */
+  .card-left {
+    grid-column: 1; grid-row: 1 / 3;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 5px; width: 80px; overflow: hidden;
+  }
+  .card-photo {
+    width: 70px; height: 70px; min-width: 70px; max-width: 70px;
+    border-radius: 50%; object-fit: cover; flex-shrink: 0;
+    border: 2px solid var(--border2); background: var(--bg3); display: block;
+  }
+  .card-photo-placeholder {
+    width: 70px; height: 70px; min-width: 70px; max-width: 70px;
+    border-radius: 50%; flex-shrink: 0;
+    border: 2px dashed var(--dim); background: var(--bg3);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px; color: var(--muted);
+  }
+  .card-pos-label {
+    font-family: 'Inter Tight', sans-serif; font-size: 10px; font-weight: 800;
+    color: var(--blue-lt); text-align: center; letter-spacing: .5px;
+    text-transform: uppercase; line-height: 1;
+  }
+  /* CENTER COL — name row1, stats row2 */
+  .card-name {
+    grid-column: 2; grid-row: 1; align-self: end;
+    font-family: 'Inter Tight', sans-serif; font-size: 13px; font-weight: 700;
+    color: var(--text); text-transform: uppercase; letter-spacing: .3px;
+    white-space: nowrap; overflow: hidden; padding-bottom: 5px;
+  }
+  .not-found .card-name { color: var(--muted); font-style: italic; text-transform: none; }
+  .card-stats {
+    grid-column: 2; grid-row: 2;
+    display: flex; flex-wrap: wrap; gap: 3px; align-content: flex-start;
+  }
+  .stat-not-found { grid-column: 2; grid-row: 2; color: var(--dim); font-size: 10px; font-style: italic; }
+  /* RIGHT COL — trash row1 */
+  .card-actions {
+    grid-column: 3; grid-row: 1; align-self: start;
+    display: flex; flex-direction: column; gap: 4px;
+  }
   .card:hover { border-color:var(--blue); transform:translateY(-2px); box-shadow:0 6px 20px rgba(26,109,186,.2); }
   .card.dragging { opacity:.35; cursor:grabbing; transform:none; box-shadow:none; }
   .card.dimmed { background:var(--bg2); border-color:var(--border); opacity:.35; filter:grayscale(.7) brightness(.65); }
   .card.dimmed:hover { opacity:.48; transform:none; box-shadow:none; }
   .card.not-found { border-style:dashed; background:var(--bg2); border-color:var(--dim); }
   .card.filtered-out { display:none; }
-  .card-photo { width:70px; height:70px; border-radius:50%; object-fit:cover; flex-shrink:0; border:2px solid var(--border2); background:var(--bg3); }
-  .card-photo-placeholder { width:70px; height:70px; border-radius:50%; flex-shrink:0; border:2px dashed var(--dim); background:var(--bg3); display:flex; align-items:center; justify-content:center; font-size:24px; color:var(--muted); }
-  .card-info { grid-column:2; grid-row:1/3; min-width:0; display:flex; flex-direction:column; gap:5px; }
-  .card-name { font-family:'Inter Tight',sans-serif; font-size:13px; font-weight:700; color:var(--text); line-height:1.25; margin-bottom:0; text-transform:uppercase; letter-spacing:.3px; white-space:nowrap; overflow:hidden; }
-  .not-found .card-name { color:var(--muted); font-style:italic; text-transform:none; }
-  .card-positions { display:flex; flex-wrap:wrap; gap:3px; margin-bottom:5px; }
+  .card-photo { width:70px; height:70px; min-width:70px; max-width:70px; border-radius:50%; object-fit:cover; flex-shrink:0; border:2px solid var(--border2); background:var(--bg3); display:block; }
+  .card-photo-placeholder { width:70px; height:70px; min-width:70px; max-width:70px; border-radius:50%; flex-shrink:0; border:2px dashed var(--dim); background:var(--bg3); display:flex; align-items:center; justify-content:center; font-size:24px; color:var(--muted); overflow:hidden; }
+  
+  /* .card-name — defined above with grid placement */
+  .card-positions { display:none; }
   .pos-badge { font-family:'Inter Tight',sans-serif; font-size:9px; font-weight:700; padding:1px 5px; border-radius:3px; border:1px solid rgba(74,158,255,.4); background:rgba(26,109,186,.15); color:var(--blue-lt); letter-spacing:.5px; }
   .card-stats { display:flex; flex-wrap:wrap; gap:3px; }
   .stat { background:rgba(255,255,255,.04); border:1px solid var(--border); border-radius:5px; padding:4px 5px; display:flex; flex-direction:column; align-items:center; min-width:30px; }
@@ -286,10 +326,14 @@
     .mobile-col { flex:0 0 100vw; width:100vw; height:100%; overflow-y:auto; padding:10px 10px 20px; display:flex; flex-direction:column; gap:0; }
     .card-row { padding:2px 0; gap:4px; }
     .row-num { font-size:14px; min-width:22px; }
-    .card { padding:8px; gap:8px; }
+    .card { padding:8px; column-gap:7px; grid-template-columns:56px 1fr auto; }
+    .card-left { width:56px; }
+    .card-photo { width:48px!important; height:48px!important; min-width:48px!important; max-width:48px!important; }
+    .card-photo-placeholder { width:48px!important; height:48px!important; font-size:18px; }
+    .card-photo-wrap { flex:0 0 52px; width:52px; }
     .card-photo { width:46px; height:46px; }
-    .card-photo-placeholder { width:46px; height:46px; font-size:18px; }
-    .card-name { font-size:12px; margin-bottom:4px; }
+    .card-photo-placeholder { width:46px; height:46px; font-size:16px; }
+    .card-name { font-size:11px; }
     .stat { padding:3px 4px; min-width:26px; }
     .stat-top { font-size:9px; }
     .stat-val { font-size:10px; }
@@ -444,6 +488,8 @@
     border-radius: 2px; display: none;
     left: 0; right: 0;
   }
+
+
 
 </style>
   <!-- Firebase -->
@@ -883,49 +929,45 @@ function buildPosHTML(name) {
 }
 
 function refreshCard(card, name) {
-  if (!card || !card.querySelector) return; // guard: skip invalid elements
+  if (!card || !card.querySelector) return;
   const s = playerState[name];
   if (!s) return;
 
-  /* photo */
+  /* 1. Photo */
   let photoEl = card.querySelector('.card-photo');
   if (!photoEl) {
-    // Player was 'not found' with placeholder — upgrade to img if we now have a photo
-    const placeholder = card.querySelector('.card-photo-placeholder');
-    if (placeholder && s.foto) {
+    const ph = card.querySelector('.card-photo-placeholder');
+    if (ph && s.foto) {
       const img = document.createElement('img');
       img.className = 'card-photo';
       img.alt = name;
       img.onerror = () => { img.src = avatarUrl(name); };
-      placeholder.replaceWith(img);
+      ph.replaceWith(img);
       photoEl = img;
     }
   }
   if (photoEl) photoEl.src = s.foto || avatarUrl(name);
 
-  const info = card.querySelector('.card-info');
-  if (!info) return; // card structure not ready, skip
-
-  /* positions */
-  let posDiv = info.querySelector('.card-positions');
-  if (!posDiv) {
-    posDiv = document.createElement('div');
-    posDiv.className = 'card-positions';
-    const nameEl = info.querySelector('.card-name');
-    if (nameEl) nameEl.after(posDiv);
-    else info.prepend(posDiv);
+  /* 2. Position label inside .card-left */
+  const left = card.querySelector('.card-left');
+  if (left) {
+    let lbl = left.querySelector('.card-pos-label');
+    const posText = (s.posicao||[]).join(' · ');
+    if (posText) {
+      if (!lbl) { lbl = document.createElement('span'); lbl.className='card-pos-label'; left.appendChild(lbl); }
+      lbl.textContent = posText;
+    } else if (lbl) { lbl.remove(); }
   }
-  posDiv.innerHTML = (s.posicao||[]).map(p => `<span class="pos-badge">${p}</span>`).join('');
 
-  /* stats */
-  const statsDiv = info.querySelector('.card-stats, .stat-not-found');
+  /* 3. Stats */
+  const statsDiv = card.querySelector('.card-stats, .stat-not-found');
   const newStats = buildStatsHTML(name);
   if (statsDiv) {
     statsDiv.outerHTML = newStats;
   } else {
     const tmp = document.createElement('div');
     tmp.innerHTML = newStats;
-    if (tmp.firstChild) info.appendChild(tmp.firstChild);
+    if (tmp.firstChild) card.querySelector('.card-actions').before(tmp.firstChild);
   }
 }
 
@@ -941,21 +983,24 @@ function buildCardEl(p) {
   const card=document.createElement('div');
   card.className='card'+(found?'':' not-found');
   card.draggable = window.matchMedia("(min-width:768px)").matches;
-  card.dataset.name=p.name;
-  card.dataset.kit=p.kit;
+  card.dataset.name = p.name;
+  card.dataset.kit  = p.kit;
+  // Force grid layout inline — immune to CSS cascade issues
+
 
   const photoEl=found
     ? `<img class="card-photo" src="${s.foto}" alt="${p.name}"
           onerror="this.src='${avatarUrl(p.name)}'>`
     : `<div class="card-photo-placeholder">?</div>`;
 
+  const posLabel = (playerState[p.name]?.posicao||[]).join(' · ') || '';
   card.innerHTML=`
-    ${photoEl}
-    <div class="card-info">
-      <div class="card-name">${p.name}</div>
-      ${buildPosHTML(p.name)}
-      ${buildStatsHTML(p.name)}
+    <div class="card-left">
+      ${photoEl}
+      ${posLabel ? `<span class="card-pos-label">${posLabel}</span>` : ''}
     </div>
+    <div class="card-name">${p.name}</div>
+    ${buildStatsHTML(p.name)}
     <div class="card-actions">
       <button class="btn-icon btn-trash" title="Desativar">🗑️</button>
       <button class="btn-icon btn-restore" title="Restaurar">↩️</button>
@@ -1376,7 +1421,7 @@ function attachTouchDrag(card, row, kit) {
 }
 
 function attachPhotoZoom(card, name) {
-  const img = card.querySelector('.card-photo');
+  const img = card.querySelector('.card-photo, .card-photo-placeholder');
   if (!img) return;
   img.style.cursor = 'zoom-in';
   img.addEventListener('click', e => {

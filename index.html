@@ -885,31 +885,38 @@ function buildPosHTML(name) {
 }
 
 function refreshCard(card, name) {
-  const s=playerState[name];
+  if (!card || !card.querySelector) return; // guard: skip invalid elements
+  const s = playerState[name];
+  if (!s) return;
+
   /* photo */
-  const photoEl=card.querySelector('.card-photo,.card-photo-placeholder');
-  if (photoEl && photoEl.tagName==='IMG') photoEl.src=s.foto||avatarUrl(name);
+  const photoEl = card.querySelector('.card-photo');
+  if (photoEl) photoEl.src = s.foto || avatarUrl(name);
+
+  const info = card.querySelector('.card-info');
+  if (!info) return; // card structure not ready, skip
+
   /* positions */
-  let posDiv=card.querySelector('.card-positions');
+  let posDiv = info.querySelector('.card-positions');
   if (!posDiv) {
-    posDiv=document.createElement('div');
-    posDiv.className='card-positions';
-    const info=card.querySelector('.card-info');
-    const nameEl=info.querySelector('.card-name');
-    nameEl.after(posDiv);
+    posDiv = document.createElement('div');
+    posDiv.className = 'card-positions';
+    const nameEl = info.querySelector('.card-name');
+    if (nameEl) nameEl.after(posDiv);
+    else info.prepend(posDiv);
   }
-  posDiv.innerHTML=buildPosHTML(name).replace(/<div[^>]*>|<\/div>/g,'').replace('class="card-positions"','');
-  posDiv.innerHTML=(s.posicao||[]).map(p=>`<span class="pos-badge">${p}</span>`).join('');
+  posDiv.innerHTML = (s.posicao||[]).map(p => `<span class="pos-badge">${p}</span>`).join('');
+
   /* stats */
-  let statsDiv=card.querySelector('.card-stats,.stat-not-found');
-  if (statsDiv) statsDiv.outerHTML=buildStatsHTML(name);
-  else {
-    const info=card.querySelector('.card-info');
-    const div=document.createElement('div'); div.innerHTML=buildStatsHTML(name);
-    info.appendChild(div.firstChild);
+  const statsDiv = info.querySelector('.card-stats, .stat-not-found');
+  const newStats = buildStatsHTML(name);
+  if (statsDiv) {
+    statsDiv.outerHTML = newStats;
+  } else {
+    const tmp = document.createElement('div');
+    tmp.innerHTML = newStats;
+    if (tmp.firstChild) info.appendChild(tmp.firstChild);
   }
-  applyFilters();
-  fitNames();
 }
 
 function buildCardEl(p) {
@@ -986,9 +993,11 @@ function buildCardEl(p) {
     document.querySelectorAll('.drop-indicator').forEach(d=>d.classList.remove('visible'));
   });
 
-  /* track by name */
-  if (!cardEls[p.name]) cardEls[p.name]=[];
-  cardEls[p.name].push(card);
+  /* track by name — only store if card has valid structure */
+  if (card.querySelector('.card-info')) {
+    if (!cardEls[p.name]) cardEls[p.name]=[];
+    cardEls[p.name].push(card);
+  }
   attachPhotoZoom(card, p.name);
   attachTouchDrag(card, row, p.kit);
 

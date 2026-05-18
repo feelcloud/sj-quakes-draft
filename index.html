@@ -71,54 +71,43 @@
     background: var(--bg4); border: 1px solid var(--border2); border-radius: 10px; padding: 9px;
     cursor: pointer; user-select: none;
     transition: border-color .2s, transform .15s, box-shadow .2s, opacity .3s, filter .3s, background .3s;
-    display: grid;
-    grid-template-columns: 80px 1fr auto;
-    grid-template-rows: auto auto;
-    column-gap: 8px;
-    row-gap: 0;
+    display: flex; flex-direction: row; gap: 8px; align-items: stretch;
   }
-  /* LEFT COL — wrapper spans both rows, centers photo+pos vertically */
   .card-left {
-    grid-column: 1; grid-row: 1 / 3;
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    gap: 5px; width: 80px; overflow: hidden;
+    flex: 0 0 72px; width: 72px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
   }
   .card-photo {
-    width: 70px; height: 70px; min-width: 70px; max-width: 70px;
-    border-radius: 50%; object-fit: cover; flex-shrink: 0;
+    width: 64px; height: 64px;
+    border-radius: 50%; object-fit: cover;
     border: 2px solid var(--border2); background: var(--bg3); display: block;
+    flex-shrink: 0;
   }
   .card-photo-placeholder {
-    width: 70px; height: 70px; min-width: 70px; max-width: 70px;
+    width: 64px; height: 64px;
     border-radius: 50%; flex-shrink: 0;
     border: 2px dashed var(--dim); background: var(--bg3);
     display: flex; align-items: center; justify-content: center;
-    font-size: 24px; color: var(--muted);
+    font-size: 22px; color: var(--muted);
   }
   .card-pos-label {
     font-family: 'Inter Tight', sans-serif; font-size: 10px; font-weight: 800;
     color: var(--blue-lt); text-align: center; letter-spacing: .5px;
     text-transform: uppercase; line-height: 1;
   }
-  /* CENTER COL — name row1, stats row2 */
+  .card-right {
+    flex: 1; min-width: 0;
+    display: flex; flex-direction: column; gap: 5px; justify-content: center;
+  }
   .card-name {
-    grid-column: 2; grid-row: 1; align-self: end;
     font-family: 'Inter Tight', sans-serif; font-size: 13px; font-weight: 700;
     color: var(--text); text-transform: uppercase; letter-spacing: .3px;
-    white-space: nowrap; overflow: hidden; padding-bottom: 5px;
+    white-space: nowrap; overflow: hidden;
   }
   .not-found .card-name { color: var(--muted); font-style: italic; text-transform: none; }
-  .card-stats {
-    grid-column: 2; grid-row: 2;
-    display: flex; flex-wrap: wrap; gap: 3px; align-content: flex-start;
-  }
-  .stat-not-found { grid-column: 2; grid-row: 2; color: var(--dim); font-size: 10px; font-style: italic; }
-  /* RIGHT COL — trash row1 */
-  .card-actions {
-    grid-column: 3; grid-row: 1; align-self: start;
-    display: flex; flex-direction: column; gap: 4px;
-  }
+  .card-stats { display: flex; flex-wrap: wrap; gap: 3px; }
+  .stat-not-found { color: var(--dim); font-size: 10px; font-style: italic; }
+  .card-actions { flex: 0 0 auto; display: flex; flex-direction: column; gap: 4px; }
   .card:hover { border-color:var(--blue); transform:translateY(-2px); box-shadow:0 6px 20px rgba(26,109,186,.2); }
   .card.dragging { opacity:.35; cursor:grabbing; transform:none; box-shadow:none; }
   .card.dimmed { background:var(--bg2); border-color:var(--border); opacity:.35; filter:grayscale(.7) brightness(.65); }
@@ -128,7 +117,6 @@
   .card-photo { width:70px; height:70px; min-width:70px; max-width:70px; border-radius:50%; object-fit:cover; flex-shrink:0; border:2px solid var(--border2); background:var(--bg3); display:block; }
   .card-photo-placeholder { width:70px; height:70px; min-width:70px; max-width:70px; border-radius:50%; flex-shrink:0; border:2px dashed var(--dim); background:var(--bg3); display:flex; align-items:center; justify-content:center; font-size:24px; color:var(--muted); overflow:hidden; }
   
-  /* .card-name — defined above with grid placement */
   .card-positions { display:none; }
   .pos-badge { font-family:'Inter Tight',sans-serif; font-size:9px; font-weight:700; padding:1px 5px; border-radius:3px; border:1px solid rgba(74,158,255,.4); background:rgba(26,109,186,.15); color:var(--blue-lt); letter-spacing:.5px; }
   .card-stats { display:flex; flex-wrap:wrap; gap:3px; }
@@ -326,14 +314,14 @@
     .mobile-col { flex:0 0 100vw; width:100vw; height:100%; overflow-y:auto; padding:10px 10px 20px; display:flex; flex-direction:column; gap:0; }
     .card-row { padding:2px 0; gap:4px; }
     .row-num { font-size:14px; min-width:22px; }
-    .card { padding:8px; column-gap:7px; grid-template-columns:56px 1fr auto; }
-    .card-left { width:56px; }
+    .card { padding:8px; gap:7px; }
+    .card-left { flex:0 0 56px; width:56px; }
     .card-photo { width:48px!important; height:48px!important; min-width:48px!important; max-width:48px!important; }
     .card-photo-placeholder { width:48px!important; height:48px!important; font-size:18px; }
     .card-photo-wrap { flex:0 0 52px; width:52px; }
-    .card-photo { width:46px; height:46px; }
-    .card-photo-placeholder { width:46px; height:46px; font-size:16px; }
-    .card-name { font-size:11px; }
+    .card-photo { width:52px!important; height:52px!important; }
+    .card-photo-placeholder { width:52px!important; height:52px!important; font-size:18px; }
+
     .stat { padding:3px 4px; min-width:26px; }
     .stat-top { font-size:9px; }
     .stat-val { font-size:10px; }
@@ -755,48 +743,79 @@ async function fbSave() {
 }
 
 /* ── apply remote state to DOM ── */
+let _applyLock = false;
 function applyFbState(data) {
-  if (!data) return;
+  if (!data || _applyLock) return;
+  _applyLock = true;
+  setTimeout(() => { _applyLock = false; }, 2000); // release after 2s max
 
+  // ── 1. Update playerState with Firebase data ──────────────────────────────
   if (data.players) {
     Object.values(data.players).forEach(pd => {
       const name = pd.n;
       if (!playerState[name]) return;
       const s = playerState[name];
-      s.posicao      = pd.p  || [];
-      s.dimmed       = pd.d  || false;
+      if (pd.p && pd.p.length) s.posicao = pd.p; // keep scraped default if FB empty
+      s.dimmed       = pd.d || false;
       s.jogos        = pd.j; s.gols = pd.g;
       s.assistencias = pd.a; s.amarelos = pd.am; s.vermelhos = pd.v;
       if (pd.f) s.foto = pd.f;
-      (cardEls[name]||[]).forEach(card => {
-        refreshCard(card, name);
-        card.classList.toggle('dimmed', s.dimmed);
-      });
     });
     dimmedCount = Object.values(playerState).filter(s=>s.dimmed).length;
     const el = document.getElementById('stat-dimmed');
     if (el) el.textContent = dimmedCount;
   }
 
+  // ── 2. Rebuild ALL cards from scratch in correct order ────────────────────
+  // Determine order for each kit (from Firebase, or keep current)
+  const orderMap = {}; // kit → [names in order]
   if (data.orders) {
     Object.entries(data.orders).forEach(([kk, names]) => {
       const kit = KIT_ORDER.find(k => fbKey(k) === kk);
-      if (!kit || !names.length) return;
-      [desktopColumns[kit], mobileLists[kit]].forEach(list => {
-        if (!list) return;
-        names.forEach(name => {
-          const row = [...list.querySelectorAll('.card-row')]
-            .find(r => r.querySelector('.card') && r.querySelector('.card').dataset.name === name);
-          if (row) list.appendChild(row);
-        });
-        if (list.classList.contains('mobile-col')) {
-          updateNumbersAndButtons(list);
-        } else {
-          updateNumbers(list);
-        }
-      });
+      if (kit && names.length) orderMap[kit] = names;
     });
   }
+
+  // Clear cardEls so rebuilding doesn't accumulate stale references
+  Object.keys(cardEls).forEach(k => { cardEls[k] = []; });
+
+  KIT_ORDER.forEach(kit => {
+    const dList = desktopColumns[kit];
+    const mList = mobileLists[kit];
+
+    // Build ordered player list for this kit
+    let kitPlayers = PLAYERS.filter(p => p.kit === kit);
+    if (orderMap[kit]) {
+      const orderedNames = orderMap[kit];
+      kitPlayers = [
+        ...orderedNames.map(n => kitPlayers.find(p => p.name === n)).filter(Boolean),
+        ...kitPlayers.filter(p => !orderedNames.includes(p.name))
+      ];
+    }
+
+    // Clear and rebuild desktop list
+    if (dList) {
+      dList.innerHTML = '';
+      kitPlayers.forEach(p => dList.appendChild(buildCardEl(p)));
+      updateNumbers(dList);
+    }
+
+    // Clear and rebuild mobile list
+    if (mList) {
+      mList.innerHTML = '';
+      kitPlayers.forEach(p => mList.appendChild(buildCardEl(p)));
+      updateNumbersAndButtons(mList);
+    }
+  });
+
+  // ── 3. Apply dimmed state ─────────────────────────────────────────────────
+  Object.entries(playerState).forEach(([name, s]) => {
+    if (s.dimmed) {
+      (cardEls[name]||[]).forEach(c => c.classList.add('dimmed'));
+    }
+  });
+
+  fitNames();
 }
 
 /* ── start: load state then listen ── */
@@ -933,42 +952,51 @@ function refreshCard(card, name) {
   const s = playerState[name];
   if (!s) return;
 
-  /* 1. Photo */
-  let photoEl = card.querySelector('.card-photo');
-  if (!photoEl) {
-    const ph = card.querySelector('.card-photo-placeholder');
-    if (ph && s.foto) {
-      const img = document.createElement('img');
-      img.className = 'card-photo';
-      img.alt = name;
-      img.onerror = () => { img.src = avatarUrl(name); };
-      ph.replaceWith(img);
-      photoEl = img;
-    }
-  }
-  if (photoEl) photoEl.src = s.foto || avatarUrl(name);
+  // Rebuild entire card interior — simplest, most reliable approach
+  const found = s.encontrado === 'SIM';
+  const foto  = s.foto || avatarUrl(name);
+  const posLabel = (s.posicao||[]).join(' · ');
 
-  /* 2. Position label inside .card-left */
-  const left = card.querySelector('.card-left');
-  if (left) {
-    let lbl = left.querySelector('.card-pos-label');
-    const posText = (s.posicao||[]).join(' · ');
-    if (posText) {
-      if (!lbl) { lbl = document.createElement('span'); lbl.className='card-pos-label'; left.appendChild(lbl); }
-      lbl.textContent = posText;
-    } else if (lbl) { lbl.remove(); }
-  }
+  const photoHTML = found
+    ? `<img class="card-photo" src="${foto}" alt="${name}" onerror="this.src='${avatarUrl(name)}'">`
+    : `<div class="card-photo-placeholder">${name.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase()}</div>`;
 
-  /* 3. Stats */
-  const statsDiv = card.querySelector('.card-stats, .stat-not-found');
-  const newStats = buildStatsHTML(name);
-  if (statsDiv) {
-    statsDiv.outerHTML = newStats;
-  } else {
-    const tmp = document.createElement('div');
-    tmp.innerHTML = newStats;
-    if (tmp.firstChild) card.querySelector('.card-actions').before(tmp.firstChild);
-  }
+  card.style.cssText += ';display:flex;flex-direction:row;gap:8px;align-items:stretch;';
+  card.innerHTML = `
+    <div class="card-left" style="flex:0 0 72px;width:72px;min-width:72px;max-width:72px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;overflow:hidden;">
+      ${photoHTML}
+      ${posLabel ? `<span class="card-pos-label">${posLabel}</span>` : ''}
+    </div>
+    <div class="card-right" style="flex:1;min-width:0;display:flex;flex-direction:column;gap:5px;justify-content:center;">
+      <div class="card-name">${name}</div>
+      ${buildStatsHTML(name)}
+    </div>
+    <div class="card-actions">
+      <button class="btn-icon btn-trash" title="Desativar">🗑️</button>
+      <button class="btn-icon btn-restore" title="Restaurar">↩️</button>
+    </div>
+  `;
+
+  // Re-attach trash/restore handlers
+  card.querySelector('.btn-trash').addEventListener('click', e => {
+    e.stopPropagation();
+    playerState[name].dimmed = true;
+    (cardEls[name]||[]).forEach(c => c.classList.add('dimmed'));
+    dimmedCount++;
+    document.getElementById('stat-dimmed').textContent = dimmedCount;
+    fbSaveSoon();
+  });
+  card.querySelector('.btn-restore').addEventListener('click', e => {
+    e.stopPropagation();
+    playerState[name].dimmed = false;
+    (cardEls[name]||[]).forEach(c => c.classList.remove('dimmed'));
+    dimmedCount = Math.max(0, dimmedCount-1);
+    document.getElementById('stat-dimmed').textContent = dimmedCount;
+    fbSaveSoon();
+  });
+  // Re-attach photo zoom
+  attachPhotoZoom(card, name);
+  fitNames();
 }
 
 function buildCardEl(p) {
@@ -994,13 +1022,17 @@ function buildCardEl(p) {
     : `<div class="card-photo-placeholder">?</div>`;
 
   const posLabel = (playerState[p.name]?.posicao||[]).join(' · ') || '';
+  // Set card layout inline — immune to CSS cascade issues
+  card.style.cssText += ';display:flex;flex-direction:row;gap:8px;align-items:stretch;';
   card.innerHTML=`
-    <div class="card-left">
+    <div class="card-left" style="flex:0 0 72px;width:72px;min-width:72px;max-width:72px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;overflow:hidden;">
       ${photoEl}
       ${posLabel ? `<span class="card-pos-label">${posLabel}</span>` : ''}
     </div>
-    <div class="card-name">${p.name}</div>
-    ${buildStatsHTML(p.name)}
+    <div class="card-right" style="flex:1;min-width:0;display:flex;flex-direction:column;gap:5px;justify-content:center;">
+      <div class="card-name">${p.name}</div>
+      ${buildStatsHTML(p.name)}
+    </div>
     <div class="card-actions">
       <button class="btn-icon btn-trash" title="Desativar">🗑️</button>
       <button class="btn-icon btn-restore" title="Restaurar">↩️</button>
@@ -1049,7 +1081,7 @@ function buildCardEl(p) {
   });
 
   /* track by name — only store if card has valid structure */
-  if (card.querySelector('.card-info')) {
+  if (card.querySelector('.card-right')) {
     if (!cardEls[p.name]) cardEls[p.name]=[];
     cardEls[p.name].push(card);
   }
@@ -1130,9 +1162,10 @@ function openModal(name) {
   modalKit_.textContent=s.kit;
   modalPhoto.src=s.foto||avatarUrl(name);
   photoUrl.value='';
-  /* positions */
+  /* position — single select, mark only first if multiple stored */
+  const firstPos = (s.posicao||[])[0] || null;
   posChips.querySelectorAll('.pos-chip').forEach(c => {
-    c.classList.toggle('sel', (s.posicao||[]).includes(c.dataset.pos));
+    c.classList.toggle('sel', c.dataset.pos === firstPos);
   });
   /* stats */
   mJogos.value = s.jogos!=='—' ? s.jogos : '';
@@ -1165,8 +1198,12 @@ overlay.addEventListener('click', e=>{ if(e.target===overlay) closeModal(); });
 
 /* position chip toggle */
 posChips.addEventListener('click', e=>{
-  const chip=e.target.closest('.pos-chip'); if(!chip) return;
-  chip.classList.toggle('sel');
+  const chip = e.target.closest('.pos-chip'); if(!chip) return;
+  const wasSelected = chip.classList.contains('sel');
+  // Deselect all
+  posChips.querySelectorAll('.pos-chip').forEach(c => c.classList.remove('sel'));
+  // If was not selected, select this one (clicking selected = deselect)
+  if (!wasSelected) chip.classList.add('sel');
 });
 
 /* photo upload */
